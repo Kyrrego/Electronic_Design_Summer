@@ -1,3 +1,6 @@
+/*包含两个kinect2+opencv2的测试文件，可以用来测试kinect和opencv2的环境配置得对不对*/
+
+
 /*
 #include "kinect.h"
 #include <iostream>
