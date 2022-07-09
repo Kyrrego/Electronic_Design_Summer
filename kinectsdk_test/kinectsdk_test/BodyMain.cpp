@@ -2,13 +2,13 @@
 
 using   namespace   std;
 using   namespace   cv;
-using   namespace   Sample;
+//using   namespace   Sample;
+#define PI 3.141592653
 
 CBodyBasics* CBodyBasics::CurBodyBasics = nullptr;
 
 //构造函数，需要改
-CBodyBasics::CBodyBasics(QObject* Parent) :
-	QObject(Parent),
+CBodyBasics::CBodyBasics() :
 	m_pKinectSensor(NULL),
 	m_pCoordinateMapper(NULL),
 	m_pBodyFrameReader(NULL),

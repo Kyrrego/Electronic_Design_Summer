@@ -29,5 +29,8 @@
     <ClInclude Include="BodyMain.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,6 +5,30 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include "Client.h"
+
+
+// Safe release for interfaces
+template<class Interface>
+inline void SafeRelease(Interface *& pInterfaceToRelease)
+{
+	if (pInterfaceToRelease != NULL)
+	{
+		pInterfaceToRelease->Release();
+		pInterfaceToRelease = NULL;
+	}
+}
+
+/*小车*/
+enum car {
+	STOP,
+	FORWARD,
+	BACKWARD,
+	TURNLEFT,
+	TURNRIGHT,
+	PAUSE,
+	DETECTION
+};
 
 /*身体位置信息的类，参考Kinect SDK-BodyBasics D2D-CBodyBasics库*/
 class CBodyBasics {
@@ -32,39 +56,7 @@ public:
 	/*处理身体信息*/
 	void  ProcessBody(INT64 nTime, int nBodyCount, IBody** ppBodies);
 
-	/*拷贝自sample，不知道有没有用*/
-	/// <summary>
-	/// Converts a body point to screen space
-	/// </summary>
-	/// <param name="bodyPoint">body point to tranform</param>
-	/// <param name="width">width (in pixels) of output buffer</param>
-	/// <param name="height">height (in pixels) of output buffer</param>
-	/// <returns>point in screen-space</returns>
-	D2D1_POINT_2F           BodyToScreen(const CameraSpacePoint& bodyPoint, int width, int height);
-
-	/// <summary>
-	/// Draws a body 
-	/// </summary>
-	/// <param name="pJoints">joint data</param>
-	/// <param name="pJointPoints">joint positions converted to screen space</param>
-	void                    DrawBody(const Joint* pJoints, const D2D1_POINT_2F* pJointPoints);
-
-	/// <summary>
-	/// Draws a hand symbol if the hand is tracked: red circle = closed, green circle = opened; blue circle = lasso
-	/// </summary>
-	/// <param name="handState">state of the hand</param>
-	/// <param name="handPosition">position of the hand</param>
-	void                    DrawHand(HandState handState, const D2D1_POINT_2F& handPosition);
-
-	/// <summary>
-	/// Draws one bone of a body (joint to joint)
-	/// </summary>
-	/// <param name="pJoints">joint data</param>
-	/// <param name="pJointPoints">joint positions converted to screen space</param>
-	/// <param name="pJointPoints">joint positions converted to screen space</param>
-	/// <param name="joint0">one joint of the bone to draw</param>
-	/// <param name="joint1">other joint of the bone to draw</param>
-	void                    DrawBone(const Joint* pJoints, const D2D1_POINT_2F* pJointPoints, JointType joint0, JointType joint1);
+	
 
 	static DWORD  framenumber;			//骨骼帧编号
 	float spinemid_xin;		//重心
@@ -82,6 +74,36 @@ public:
 	float leftfoot_yin = 0, leftfoot_yout = 0, leftfoot_y = 0;
 	float base_foot_in = 0, base_foot_out = 0, base_foot = 0;
 	float spinetemp = 0;
+
+	const double thresh_x = 0.15;
+	const double thresh_z = 0.15;
+	const double handdistance = 0.10;
+	unsigned char Msg[10];
+	char Msgsend[10];
+
+
+	int flag = 0;		//下蹲标志位
+	int handstate = 0;
+
+	int armstate = 0; //1 for start
+	int mapstate = 0; //1 for drawing map
+	//car carstate = STOP;
+	Send SendMsg;
+	fstream file;
+
+	char detectionstate = 0;
+
+	bool Is_SendMsg = true;
+	bool Is_SendPort = false;
+	int close = 0;
+	int Humiclose = 0;
+	char TempData[4];
+
+	static CBodyBasics* CurBodyBasics;
+	//pthread_t threads_kinect;
+	int rc_kinect;
+	//pthread_t threads_humi;
+	int rc_humi;
 
 private:
 	IKinectSensor*          m_pKinectSensor;//kinect源
